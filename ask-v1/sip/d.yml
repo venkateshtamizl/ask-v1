@@ -1,5 +1,9 @@
 version: "3.8"
 
+networks:
+  voip_net:
+    driver: bridge
+
 services:
   asterisk:
     build:
@@ -7,6 +11,11 @@ services:
       dockerfile: Dockerfile
     image: asterisk-local:latest        # Gives the built image a name
     container_name: asterisk
+    hostname: sip.local
+    networks:
+      voip_net:
+        aliases:
+          - sip.local
 
     # ---------- Network Ports ----------
     ports:

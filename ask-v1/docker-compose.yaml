@@ -1,0 +1,44 @@
+version: "3.8"
+
+networks:
+  voip_net:
+    driver: bridge
+
+services:
+  asterisk:
+    build:
+      context: ./sip
+      dockerfile: Dockerfile
+    image: asterisk-local:latest
+    container_name: asterisk
+    hostname: sip
+    networks:
+      voip_net:
+        aliases:
+          - sip.local
+    ports:
+      - "5060:5060/udp"
+      - "8088:8088/tcp"
+    volumes:
+      - ./sip/etc:/etc/asterisk
+      - ./sip/log:/var/log/asterisk
+      - ./sip/spool:/var/spool/asterisk
+      - ./sip/certs:/etc/asterisk/keys
+    restart: unless-stopped
+
+  webrtc-ui:
+    build:
+      context: ./asteriskfrontends
+      dockerfile: Dockerfile
+    container_name: webrtc-ui
+    hostname: frontend
+    networks:
+      voip_net:
+        aliases:
+          - frontend.local
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./asteriskfrontends/nginx/certs:/etc/nginx/certs
+    restart: unless-stopped
