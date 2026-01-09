@@ -58,14 +58,15 @@ const WebRTCPhone = () => {
   }, []);
 
   useEffect(() => {
-    const socket = new JsSIP.WebSocketInterface("wss://192.168.1.5:8443/ws");
+    const WS_URL = `wss://${window.location.host}/ws`;
+    const socket = new JsSIP.WebSocketInterface(WS_URL);
     const configuration = {
       sockets: [socket],
-      uri: "sip:9001@192.168.1.5",
+      uri: `sip:9001@${window.location.hostname}`,
       password: "1234",
       display_name: "WebRTC Client",
-      session_timers: false,
       register: true,
+      session_timers: false,
     };
     const userAgent = new JsSIP.UA(configuration);
     setUa(userAgent);
@@ -170,7 +171,7 @@ const WebRTCPhone = () => {
     if (!ua || !ua.isRegistered()) return alert("❌ SIP not connected.");
     if (!target) return alert("Select an extension!");
     setStatus(`📲 Dialing ${target}...`);
-    const newSession = ua.call(`sip:${target}@192.168.1.5`, {
+    const newSession = ua.call(`sip:${target}@${window.location.hostname}`, {
       mediaConstraints: { audio: true, video: false },
     });
     attachRemoteStream(newSession);
